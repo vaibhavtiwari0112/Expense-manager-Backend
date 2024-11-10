@@ -1,65 +1,90 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const prisma = require("../prismaClient"); // Adjust the path based on your project structure
-const {JWT_SECRET_KEY } = process.env
+const { JWT_SECRET_KEY } = process.env;
+
+// Check if JWT Secret Key is defined in environment variables
+if (!JWT_SECRET_KEY) {
+  throw new Error("JWT Secret Key is not defined in the environment variables");
+}
 
 const AuthService = {
+  // Register a new user
   async register({ name, email, password }) {
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      throw new Error("Email is already registered");
-    }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create a new user
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-      },
-    });
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name },
-      JWT_SECRET_KEY
-    );
-
-    return { user, token };
-  },
-
-  async login({ email, password }) {
     try {
-      const user = await prisma.user.findUnique({ where: { email } });
-      if (!user) throw new Error("User not found");
-  
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) throw new Error("Invalid credentials");
-  
+      // Check if the user already exists
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (existingUser) {
+        throw new Error("Email is already registered");
+      }
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create a new user in the database
+      const user = await prisma.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+        },
+      });
+
+      // Generate a JWT token for the new user
       const token = jwt.sign(
         { id: user.id, email: user.email, name: user.name },
         JWT_SECRET_KEY,
         { expiresIn: '1h' }
       );
-  
+
       return { user, token };
     } catch (error) {
+      console.error("Registration Error:", error.message);
+      throw new Error(`Registration failed: ${error.message}`);
+    }
+  },
+
+  // Login an existing user
+  async login({ email, password }) {
+    try {
+      console.log("Login attempt with email:", email); // Debug: Log the email
+
+      // Find the user by email
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      // Validate the provided password with the hashed password in the database
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        throw new Error("Invalid credentials");
+      }
+
+      // Generate a JWT token for the authenticated user
+      const token = jwt.sign(
+        { id: user.id, email: user.email, name: user.name },
+        JWT_SECRET_KEY,
+        { expiresIn: '1h' }
+      );
+
+      return { user, token };
+    } catch (error) {
+      console.error("Login Error:", error.message);
       throw new Error(`Login failed: ${error.message}`);
     }
   },
-  
 
+  // Logout function (placeholder if you implement session-based logout)
   async logout(req) {
-    return true; 
+    // Add any specific logout handling if needed
+    return true;
   },
 
+  // Check if the user is logged in by verifying the JWT token
   async isLoggedIn(req) {
     const authHeader = req.headers.authorization;
 
@@ -73,6 +98,7 @@ const AuthService = {
       const user = jwt.verify(token, JWT_SECRET_KEY);
       return { loggedIn: true, user };
     } catch (error) {
+      console.error("Token verification error:", error.message);
       return { loggedIn: false };
     }
   },
