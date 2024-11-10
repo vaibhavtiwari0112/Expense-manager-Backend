@@ -33,7 +33,6 @@ const AuthService = {
         },
       });
 
-      // Generate a JWT token for the new user
       const token = jwt.sign(
         { id: user.id, email: user.email, name: user.name },
         JWT_SECRET_KEY,
@@ -47,24 +46,19 @@ const AuthService = {
     }
   },
 
-  // Login an existing user
   async login({ email, password }) {
     try {
-      console.log("Login attempt with email:", email); // Debug: Log the email
-
-      // Find the user by email
+      console.log("Login attempt with email:", email); 
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
         throw new Error("User not found");
       }
 
-      // Validate the provided password with the hashed password in the database
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
         throw new Error("Invalid credentials");
       }
 
-      // Generate a JWT token for the authenticated user
       const token = jwt.sign(
         { id: user.id, email: user.email, name: user.name },
         JWT_SECRET_KEY,
@@ -78,13 +72,11 @@ const AuthService = {
     }
   },
 
-  // Logout function (placeholder if you implement session-based logout)
+
   async logout(req) {
-    // Add any specific logout handling if needed
     return true;
   },
 
-  // Check if the user is logged in by verifying the JWT token
   async isLoggedIn(req) {
     const authHeader = req.headers.authorization;
 
