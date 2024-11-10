@@ -36,21 +36,25 @@ const AuthService = {
   },
 
   async login({ email, password }) {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) throw new Error("User not found");
-
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) throw new Error("Invalid credentials");
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name },
-      JWT_SECRET_KEY,
-      { expiresIn: '1h' } 
-    );
-
-    return { user, token }; 
+    try {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user) throw new Error("User not found");
+  
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) throw new Error("Invalid credentials");
+  
+      const token = jwt.sign(
+        { id: user.id, email: user.email, name: user.name },
+        JWT_SECRET_KEY,
+        { expiresIn: '1h' }
+      );
+  
+      return { user, token };
+    } catch (error) {
+      throw new Error(`Login failed: ${error.message}`);
+    }
   },
+  
 
   async logout(req) {
     return true; 
