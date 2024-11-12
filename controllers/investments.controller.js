@@ -2,7 +2,7 @@ const InvestmentsService = require("../services/investments.service");
 
 const InvestmentsController = {
   async createInvestment(req, res) {
-    const userId = req.user.id; // Assuming user ID is available in req.user after authentication
+    const userId = req.user.id;
     const { amount } = req.body;
 
     try {
@@ -20,7 +20,7 @@ const InvestmentsController = {
   },
 
   async getInvestments(req, res) {
-    const userId = req.user.id; // Assuming user ID is available in req.user after authentication
+    const userId = req.user.id;
 
     try {
       const investments = await InvestmentsService.getInvestments(userId);

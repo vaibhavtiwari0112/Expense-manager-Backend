@@ -11,8 +11,8 @@ const authMiddleware = (req, res, next) => {
 
   try {
     const user = jwt.verify(token, JWT_SECRET_KEY); 
-    req.user = user; // Add user data to the request object
-    next(); // Proceed to the next middleware or route handler
+    req.user = user;
+    next(); 
   } catch (error) {
     return res.status(401).json({ message: "Invalid Token" });
   }

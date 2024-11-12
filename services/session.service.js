@@ -2,7 +2,7 @@ const prisma = require("../prismaClient");
 
 const SessionService = {
   async createSession(userId) {
-    const expiresAt = new Date(Date.now() + 20 * 60 * 1000); // 20 minutes from now
+    const expiresAt = new Date(Date.now() + 20 * 60 * 1000);
     const session = await prisma.session.create({
       data: {
         userId,
@@ -21,7 +21,7 @@ const SessionService = {
         },
       },
     });
-    return !!session; // Return true if session exists and is valid
+    return !!session; 
   },
 };
 

@@ -1,5 +1,5 @@
-// services/dashboard.service.js
-const prisma = require("../prismaClient"); // Adjust the path based on your project structure
+
+const prisma = require("../prismaClient"); 
 
 const DashboardService = {
   async getDashboardData(userId) {

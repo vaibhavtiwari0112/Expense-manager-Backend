@@ -1,6 +1,6 @@
 const express = require("express");
 const AuthController = require("../controllers/auth.controller");
-const { isAuthenticated } = require("../middleware/authMiddleware"); // Middleware to check if the user is authenticated
+const { isAuthenticated } = require("../middleware/authMiddleware"); 
 
 const router = express.Router();
 

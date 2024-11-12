@@ -8,7 +8,7 @@ const TransactionsService = {
         amount,
         description,
         currency,
-        type, // Include type in the transaction creation
+        type, 
       },
     });
     return transaction;
@@ -16,21 +16,16 @@ const TransactionsService = {
 
   async getTransactions(userId, page, itemsPerPage) {
     try {
-      // Ensure userId is an integer
+      
       if (isNaN(userId)) {
         console.error("Invalid userId:", userId);
         return [];
-      }
-  
-      console.log("Fetching transactions for userId:", userId);
-  
+      }  
       const transactions = await prisma.transaction.findMany({
-        where: { userId }, // Ensure userId matches the integer type
-        skip: page * itemsPerPage,         // Skip based on page number
-        take: itemsPerPage,                // Limit based on page size
+        where: { userId }, 
+        skip: page * itemsPerPage,
+        take: itemsPerPage,   
       });
-  
-      console.log("Transactions found:", transactions.length);
       return transactions;
     } catch (error) {
       console.error("Error fetching transactions:", error);

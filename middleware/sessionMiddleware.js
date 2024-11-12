@@ -1,16 +1,16 @@
 const session = require("express-session");
-const PrismaSessionStore = require('@quixo3/prisma-session-store').PrismaSessionStore; // Ensure you are importing PrismaSessionStore
+const PrismaSessionStore = require('@quixo3/prisma-session-store').PrismaSessionStore; 
 const prisma = require("../prismaClient");
 
 const sessionMiddleware = session({
   cookie: {
-    maxAge: 20 * 60 * 1000, // 20 minutes
-    secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+    maxAge: 20 * 60 * 1000, 
+    secure: process.env.NODE_ENV === "production", 
   },
   store: new PrismaSessionStore(prisma, {
-    checkPeriod: 2 * 60 * 1000, // Check session store every 2 minutes
+    checkPeriod: 2 * 60 * 1000, 
   }),
-  secret: process.env.SESSION_SECRET || 'defaultSecret', // Fallback in case process.env.SESSION_SECRET is not set
+  secret: process.env.SESSION_SECRET || 'defaultSecret', 
   resave: false,
   saveUninitialized: false,
 });

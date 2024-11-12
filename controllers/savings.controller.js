@@ -2,7 +2,7 @@ const SavingsService = require("../services/savings.service");
 
 const SavingsController = {
   async createSaving(req, res) {
-    const userId = req.user.id; // Assuming user ID is available in req.user after authentication
+    const userId = req.user.id; 
     const { amount } = req.body;
 
     try {
@@ -20,7 +20,7 @@ const SavingsController = {
   },
 
   async getSavings(req, res) {
-    const userId = req.user.id; // Assuming user ID is available in req.user after authentication
+    const userId = req.user.id; 
 
     try {
       const savings = await SavingsService.getSavings(userId);

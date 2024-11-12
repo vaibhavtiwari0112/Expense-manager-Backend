@@ -4,7 +4,7 @@ const ExpensesService = require("../services/transactions.service");
 
 const DashboardController = {
   async getDashboardData(req, res) {
-    const userId = req.user.id; // Assuming user ID is available in req.user after authentication
+    const userId = req.user.id; 
 
     try {
       const savings = await SavingsService.getSavings(userId);

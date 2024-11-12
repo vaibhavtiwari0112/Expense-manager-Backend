@@ -1,18 +1,18 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const prisma = require("../prismaClient"); // Adjust the path based on your project structure
+const prisma = require("../prismaClient"); 
 const { JWT_SECRET_KEY } = process.env;
 
-// Check if JWT Secret Key is defined in environment variables
+
 if (!JWT_SECRET_KEY) {
   throw new Error("JWT Secret Key is not defined in the environment variables");
 }
 
 const AuthService = {
-  // Register a new user
+
   async register({ name, email, password }) {
     try {
-      // Check if the user already exists
+
       const existingUser = await prisma.user.findUnique({
         where: { email },
       });
@@ -21,10 +21,10 @@ const AuthService = {
         throw new Error("Email is already registered");
       }
 
-      // Hash the password
+
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create a new user in the database
+
       const user = await prisma.user.create({
         data: {
           name,
@@ -48,7 +48,6 @@ const AuthService = {
 
   async login({ email, password }) {
     try {
-      console.log("Login attempt with email:", email); 
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
         throw new Error("User not found");

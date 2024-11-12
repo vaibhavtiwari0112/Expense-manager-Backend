@@ -2,8 +2,8 @@ const TransactionsService = require("../services/transactions.service");
 
 const TransactionsController = {
   async createTransaction(req, res) {
-    const userId = req.user.id; // Assuming user ID is available in req.user after authentication
-    const { amount, description, currency, type } = req.body; // Get type from request body
+    const userId = req.user.id; 
+    const { amount, description, currency, type } = req.body;
 
     try {
       const transaction = await TransactionsService.createTransaction(userId, amount, description, currency, type);
@@ -21,7 +21,7 @@ const TransactionsController = {
 
   async getTransactions(req, res) {
     const userId = req.user.id;
-    const { page = 0, itemsPerPage = 5} = req.query; // Assuming user ID is available in req.user after authentication
+    const { page = 0, itemsPerPage = 5} = req.query; 
 
     try {
       const transactions = await TransactionsService.getTransactions(userId, parseInt(page), parseInt(itemsPerPage));

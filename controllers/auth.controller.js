@@ -3,7 +3,6 @@ const AuthService = require("../services/auth.service");
 const AuthController = {
   async register(req, res) {
     try {
-      console.log("Register request body:", req.body); // Log the incoming request body
       const user = await AuthService.register(req.body);
       res.status(201).json({
         message: "User registered successfully",
@@ -19,7 +18,6 @@ const AuthController = {
 
   async login(req, res) {
     try {
-      console.log("Login request body:", req.body); // Log the incoming request body
       const { user, token } = await AuthService.login(req.body);
       res.status(200).json({
         message: "Login successful",
