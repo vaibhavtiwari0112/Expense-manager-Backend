@@ -7,6 +7,10 @@ const router = express.Router();
 
 router.post("/signup", AuthController.register);
 router.post("/login", AuthController.login);
+router.post("/google", AuthController.googleLogin);
+router.post("/verify-email", AuthController.verifyOTP)
+router.post("/send", AuthController.sendVerificationEmail);
+router.post("/resend-otp", AuthController.resendOTP);
 
 
 module.exports = router;
