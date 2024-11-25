@@ -48,14 +48,14 @@ const AuthController = {
   },
 
    async sendVerificationEmail(req, res) {
-    const { email = 'vaibhav45tiwari@gmail.com'} = req.body;
+    const { email } = req.body;
   console.log(req.body);
     try {
-      const result = await verifyEmailService.sendVerificationEmail(email);
-      res.status(200).json({ success: true, message: "Verification email sent", result });
+  if(email) {  const result = await verifyEmailService.sendVerificationEmail(email);
+      res.status(200).json({ success: true, message: "Verification email sent", result });}
     } catch (error) {
       console.error("Error sending verification email:", error);
-      res.status(500).json({ success: false, message: "Failed to send verification email" });
+      res.status(500).json({ success: false, message: "Failed to send verification email" , error : error.message});
     }
   },
 
