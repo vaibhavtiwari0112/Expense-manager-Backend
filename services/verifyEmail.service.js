@@ -22,7 +22,7 @@ console.log(`Verification email`, email);
 
     const mailOptions = {
       to: email, 
-      from: 'vaibhavforapplication@gmail.com',
+      from: 'vaibhavtiwari0128@gmail.com',
       subject: 'Verify Your Email',
       html: emailTemplate,
     };
@@ -54,8 +54,12 @@ exports.resendOTP = async (email) => {
   if (!email) throw new Error("Email address is required to resend OTP");
 
   if (!otpStorage.has(email)) {
-    throw new Error("Email not found. Please request a new OTP.");
+    console.log('OTP not found for email:', email);
+    return await this.sendVerificationEmail(email); 
   }
+
+  const { otp } = otpStorage.get(email);
+  console.log('Resending existing OTP:', otp);
 
   return await this.sendVerificationEmail(email);
 };
