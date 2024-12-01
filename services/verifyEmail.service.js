@@ -11,7 +11,7 @@ exports.sendVerificationEmail = async (email) => {
     if (!email) {
       throw new Error("Email address is required to send a verification email");
     }
-console.log(`Verification email`, email);
+    console.log(`Verification email`, email);
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     otpStorage.set(email, otp);
 
