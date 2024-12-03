@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Transaction Report</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    h1 {
+      color: #4b0082; /* Indigo color */
+      font-size: 24px;
+      text-align: center;
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.5;
+      color: #555;
+    }
+
+    .highlight {
+      color: #4b0082;
+      font-weight: bold;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 14px;
+      color: #888;
+      margin-top: 30px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4b0082;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+
+    .table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    .table th, .table td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    .table th {
+      background-color: #4b0082;
+      color: #fff;
+    }
+
+    .table td {
+      background-color: #f9f9f9;
+    }
+
+    .table .amount {
+      text-align: right;
+      font-weight: bold;
+      color: #4b0082;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Transaction Report</h1>
+    <p>Dear User,</p>
+    <p>We hope you're doing well. Please find below your transaction report, which includes all your <span class="highlight">expenses</span>, <span class="highlight">savings</span>, and <span class="highlight">investments</span> for your records.</p>
+    <p><span class="highlight">Report generated on:</span> <%= currentDate %></p>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Amount (Rs.)</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% transactions.forEach(function(transaction) { %>
+          <tr>
+            <td><%= new Date(transaction.createdAt).toLocaleDateString() %></td>
+            <td><%= transaction.description || 'No description' %></td>
+            <td class="amount">Rs. <%= transaction.amount %></td>
+            <td><%= transaction.type %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <a href="#" class="btn">View Full Report</a>
+
+    <div class="footer">
+      <p>Thank you for using our Expense Tracker Service!</p>
+      <p>If you have any questions or need assistance, feel free to contact us.</p>
+    </div>
+  </div>
+</body>
+</html>
