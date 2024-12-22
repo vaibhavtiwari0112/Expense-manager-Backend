@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "profileImagePath" SET DATA TYPE TEXT,
+ALTER COLUMN "profileImageUrl" SET DATA TYPE TEXT;
