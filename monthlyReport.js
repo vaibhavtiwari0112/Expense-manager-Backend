@@ -6,11 +6,14 @@ const MonthlyReportJob = {
   async sendMonthlyReports() {
     try {
       const currentDate = new Date();
+      const startOfDay = new Date(currentDate.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(currentDate.setHours(23, 59, 59, 999));
 
       const users = await prisma.user.findMany({
         where: {
           salaryDate: {
-            equals: currentDate.toISOString().split("T")[0],
+            gte: startOfDay,
+            lte: endOfDay,
           },
         },
         select: { id: true, email: true },
@@ -23,7 +26,6 @@ const MonthlyReportJob = {
 
       console.log(`Sending reports to ${users.length} user(s)...`);
 
-      // Send reports to each user
       for (const user of users) {
         try {
           await ReportService.sendReport(user.id);
@@ -36,7 +38,11 @@ const MonthlyReportJob = {
         }
       }
     } catch (error) {
-      console.error("Error executing monthly report job:", error);
+      console.error(
+        "Error executing monthly report job:",
+        error.message,
+        error.stack
+      );
     }
   },
 };

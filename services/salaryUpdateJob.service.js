@@ -3,40 +3,33 @@ const prisma = require("../prismaClient");
 const SalaryUpdateJob = {
   async updateSalaries() {
     try {
-      // Get the current date
       const currentDate = new Date();
 
-      // Fetch all users whose salaryDate has passed (salaryDate is earlier than today)
       const users = await prisma.user.findMany({
         where: {
           salaryDate: {
-            lte: currentDate, // Salary date is today or earlier (to handle cases when the job runs late)
+            lte: currentDate,
           },
         },
       });
 
       for (const user of users) {
-        // Get the day of the month for the user's current salary date
         const salaryDay = new Date(user.salaryDate).getDate();
-
-        // Calculate the next month's salary date (same day as current salary date)
         const nextSalaryDate = new Date(
           currentDate.getFullYear(),
           currentDate.getMonth() + 1,
           salaryDay
         );
 
-        // Handle case where the salary day is the last day of the month (e.g., 31st)
         const daysInNextMonth = new Date(
           currentDate.getFullYear(),
           currentDate.getMonth() + 2,
           0
         ).getDate();
         if (salaryDay > daysInNextMonth) {
-          nextSalaryDate.setDate(daysInNextMonth); // Set to the last day of next month
+          nextSalaryDate.setDate(daysInNextMonth);
         }
 
-        // Calculate total expenses and investments for the user for the current month
         const firstDayOfMonth = new Date(
           currentDate.getFullYear(),
           currentDate.getMonth(),
@@ -48,28 +41,26 @@ const SalaryUpdateJob = {
           0
         );
 
-        const totalExpenses = await prisma.expenses.aggregate({
+        const totalExpenses = await prisma.transaction.aggregate({
           _sum: { amount: true },
           where: {
-            transaction: {
-              userId: user.id,
-              createdAt: {
-                gte: firstDayOfMonth,
-                lte: lastDayOfMonth,
-              },
+            userId: user.id,
+            type: "expense", // Filter for expenses
+            createdAt: {
+              gte: firstDayOfMonth,
+              lte: lastDayOfMonth,
             },
           },
         });
 
-        const totalInvestments = await prisma.investments.aggregate({
+        const totalInvestments = await prisma.transaction.aggregate({
           _sum: { amount: true },
           where: {
-            transaction: {
-              userId: user.id,
-              createdAt: {
-                gte: firstDayOfMonth,
-                lte: lastDayOfMonth,
-              },
+            userId: user.id,
+            type: "investment", // Filter for investments
+            createdAt: {
+              gte: firstDayOfMonth,
+              lte: lastDayOfMonth,
             },
           },
         });
@@ -77,16 +68,28 @@ const SalaryUpdateJob = {
         const totalExpensesAmount = totalExpenses._sum.amount || 0;
         const totalInvestmentsAmount = totalInvestments._sum.amount || 0;
 
-        // Calculate the remaining salary
-        const remainingSalary =
-          user.salary - (totalExpensesAmount + totalInvestmentsAmount);
+        const remainingSalary = Math.max(
+          user.salary - (totalExpensesAmount + totalInvestmentsAmount),
+          0
+        );
 
-        // Update the user's salary and set the next salary date
+        const savingsEntry = await prisma.savings.create({
+          data: {
+            userId: user.id,
+            amount: remainingSalary,
+            description: "Remaining salary for the month",
+            currency: "INR",
+            type: "saving",
+            createdAt: new Date(),
+          },
+        });
+
+        console.log("Savings updated:", savingsEntry);
+
         await prisma.user.update({
           where: { id: user.id },
           data: {
-            salary: remainingSalary,
-            salaryDate: nextSalaryDate, // Update salary date to next month
+            salaryDate: nextSalaryDate,
           },
         });
 
@@ -97,7 +100,7 @@ const SalaryUpdateJob = {
         );
       }
     } catch (error) {
-      console.error("Error updating salaries:", error);
+      console.error("Error updating salaries:", error.message, error.stack);
     }
   },
 };
