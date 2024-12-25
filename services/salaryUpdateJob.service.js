@@ -43,7 +43,6 @@ const SalaryUpdateJob = {
           0
         );
 
-        // Calculate total expenses for the current month
         const totalExpenses = await prisma.transaction.aggregate({
           _sum: { amount: true },
           where: {

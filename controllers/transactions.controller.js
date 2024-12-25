@@ -3,7 +3,7 @@ const TransactionsService = require("../services/transactions.service");
 const TransactionsController = {
   async createTransaction(req, res) {
     const userId = req.user.id;
-    const { amount, description, currency, type } = req.body;
+    const { amount, description, currency, type, createdAt } = req.body;
 
     try {
       const transaction = await TransactionsService.createTransaction(
@@ -11,7 +11,8 @@ const TransactionsController = {
         amount,
         description,
         currency,
-        type
+        type,
+        createdAt
       );
       res.status(201).json({
         message: "Transaction created successfully",

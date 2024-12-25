@@ -1,7 +1,14 @@
 const prisma = require("../prismaClient");
 
 const TransactionsService = {
-  async createTransaction(userId, amount, description, currency = "INR", type) {
+  async createTransaction(
+    userId,
+    amount,
+    description,
+    currency = "INR",
+    type,
+    createdAt
+  ) {
     try {
       const createdTransaction = await prisma.$transaction(async (prisma) => {
         // Step 1: Create the transaction
@@ -12,6 +19,7 @@ const TransactionsService = {
             description,
             currency,
             type,
+            createdAt,
           },
         });
 
@@ -23,6 +31,7 @@ const TransactionsService = {
               amount,
               description,
               currency,
+              createdAt,
             },
           });
         } else if (type === "investment") {
@@ -32,6 +41,7 @@ const TransactionsService = {
               amount,
               description,
               currency,
+              createdAt,
             },
           });
         }
