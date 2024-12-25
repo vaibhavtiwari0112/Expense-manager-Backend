@@ -5,6 +5,7 @@ const SalaryUpdateJob = {
     try {
       const currentDate = new Date();
 
+      // Fetch users whose salary date is on or before the current date
       const users = await prisma.user.findMany({
         where: {
           salaryDate: {
@@ -26,6 +27,7 @@ const SalaryUpdateJob = {
           currentDate.getMonth() + 2,
           0
         ).getDate();
+
         if (salaryDay > daysInNextMonth) {
           nextSalaryDate.setDate(daysInNextMonth);
         }
@@ -41,6 +43,7 @@ const SalaryUpdateJob = {
           0
         );
 
+        // Calculate total expenses for the current month
         const totalExpenses = await prisma.transaction.aggregate({
           _sum: { amount: true },
           where: {
@@ -53,6 +56,7 @@ const SalaryUpdateJob = {
           },
         });
 
+        // Calculate total investments for the current month
         const totalInvestments = await prisma.transaction.aggregate({
           _sum: { amount: true },
           where: {
@@ -68,24 +72,46 @@ const SalaryUpdateJob = {
         const totalExpensesAmount = totalExpenses._sum.amount || 0;
         const totalInvestmentsAmount = totalInvestments._sum.amount || 0;
 
+        // Calculate remaining salary
         const remainingSalary = Math.max(
           user.salary - (totalExpensesAmount + totalInvestmentsAmount),
           0
         );
 
-        const savingsEntry = await prisma.savings.create({
+        // Create a transaction entry for the savings
+        const savingsTransaction = await prisma.transaction.create({
           data: {
             userId: user.id,
+            amount: remainingSalary,
+            type: "saving", // Type for savings
+            description: "Salary savings for the month",
+            currency: "INR",
+            createdAt: new Date(),
+          },
+        });
+
+        console.log("Savings transaction created:", savingsTransaction);
+
+        // Create a savings entry for the user
+        const savingsEntry = await prisma.savings.create({
+          data: {
             amount: remainingSalary,
             description: "Remaining salary for the month",
             currency: "INR",
             type: "saving",
             createdAt: new Date(),
+            user: {
+              connect: { id: user.id }, // Ensure the savings is linked to the correct user
+            },
+            transaction: {
+              connect: { id: savingsTransaction.id }, // Link the created transaction to savings entry
+            },
           },
         });
 
         console.log("Savings updated:", savingsEntry);
 
+        // Update the user's salary date to the next month
         await prisma.user.update({
           where: { id: user.id },
           data: {
